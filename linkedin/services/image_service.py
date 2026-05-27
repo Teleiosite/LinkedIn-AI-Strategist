@@ -1,5 +1,5 @@
 """
-ImageService: Generates and processes images using DALL-E 3.
+ImageService: Generates and processes images using the AI Router.
 """
 import io
 import json
@@ -9,11 +9,11 @@ import uuid
 from pathlib import Path
 
 import httpx
-from openai import OpenAI
 from PIL import Image, ImageDraw, ImageFont
 
 from linkedin.models import LinkedInProfile, GeneratedPost
 from linkedin.services.prompt_engine import PromptEngine
+from linkedin.services.ai_router import AIRouter
 
 logger = logging.getLogger(__name__)
 
@@ -25,23 +25,27 @@ IMAGES_DIR = Path("media/linkedin/images")
 
 class ImageService:
 
-    def __init__(self, api_key: str):
-        self.client = OpenAI(api_key=api_key)
+    def __init__(self):
+        self.router = AIRouter()
         IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
     def generate_for_post(
         self,
         profile: LinkedInProfile,
         post_text: str,
-        post_type: str
+        post_type: str,
+        visual_brief: dict = None
     ) -> dict:
         """
-        Full pipeline: post text → visual brief → DALL-E prompt → image → processed image.
+        Full pipeline: post text → visual brief → image prompt → image → processed image.
         Returns dict with image_url, image_local_path, image_prompt_used,
                          image_format, image_emotion, image_metaphor, image_color_palette.
         """
-        # Step 1: Get visual brief from GPT-4o
-        visual_brief = self._get_visual_brief(post_text, post_type)
+        # Step 1: Get visual brief if not provided
+        if not visual_brief:
+            from linkedin.services.content_service import ContentService
+            content_svc = ContentService()
+            visual_brief = content_svc.generate_visual_brief(post_text, post_type)
 
         # Step 2: Build DALL-E prompt
         image_format = visual_brief.get("image_format", "abstract_scene")
@@ -53,18 +57,13 @@ class ImageService:
             user_watermark=profile.brand_watermark_text,
         )
 
-        # Step 3: Generate image with DALL-E 3
-        response = self.client.images.generate(
-            model="dall-e-3",
+        # Step 3: Generate image using AI Router
+        response = self.router.generate_image(
+            task="image_generation",
             prompt=dalle_prompt,
-            size="1792x1024",
-            quality="hd",
-            style="vivid",
-            n=1,
         )
 
-        image_url = response.data[0].url
-        revised_prompt = response.data[0].revised_prompt or dalle_prompt
+        image_url = response["image_url"]
 
         # Step 4: Download and post-process the image
         local_path = self._download_and_process(
@@ -86,20 +85,10 @@ class ImageService:
             "image_emotion": visual_brief.get("core_emotion", ""),
             "image_metaphor": visual_brief.get("key_metaphor", ""),
             "image_color_palette": color_str,
+            "image_model_used": response.get("model", ""),
+            "image_provider": response.get("provider", ""),
+            "cost_usd": response.get("cost_usd", 0),
         }
-
-    def _get_visual_brief(self, post_text: str, post_type: str) -> dict:
-        """Use GPT-4o to analyze the post and create a visual brief."""
-        prompt = PromptEngine.get_visual_brief_prompt(post_text, post_type)
-
-        response = self.client.chat.completions.create(
-            model="gpt-4o",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.7,
-            response_format={"type": "json_object"}
-        )
-
-        return json.loads(response.choices[0].message.content)
 
     def _download_and_process(
         self,

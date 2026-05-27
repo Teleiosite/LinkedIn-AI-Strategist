@@ -51,6 +51,17 @@ class ContentService:
         logger.info(f"Generated {post_type} post for profile {profile.id}, cost: ${response['cost_usd']:.4f}")
         return result
 
+    def generate_visual_brief(self, post_text: str, post_type: str) -> dict:
+        """Use the AI Router to analyze the post and create a visual brief."""
+        prompt = PromptEngine.get_visual_brief_prompt(post_text, post_type)
+        response = self.router.complete(
+            task="visual_brief",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.7,
+            json_mode=True
+        )
+        return json.loads(response["text"])
+
     def generate_comment(
         self,
         profile: LinkedInProfile,

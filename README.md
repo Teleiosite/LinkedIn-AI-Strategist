@@ -1,81 +1,116 @@
-# PyRunner
+# LinkedIn AI Strategist & Automation SaaS
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)](https://hub.docker.com/r/hasanaboulhasan/pyrunner)
-[![Version](https://img.shields.io/badge/Version-1.1.1-green.svg)](https://github.com/hassancs91/PyRunner/releases)
-[![Discord](https://img.shields.io/badge/Discord-Join%20Server-5865F2?logo=discord&logoColor=white)](https://discord.gg/BjkmTn7XSd)
+[![Python Version](https://img.shields.io/badge/Python-3.10%2B-blue)](https://www.python.org/)
+[![Django Version](https://img.shields.io/badge/Django-6.0-green)](https://www.djangoproject.com/)
+[![Playwright](https://img.shields.io/badge/Playwright-Enabled-blueviolet)](https://playwright.dev/)
 
-A self-hosted Python script automation platform. Upload a script, schedule it, monitor it — nothing else to configure.
+An advanced LinkedIn AI Strategist SaaS platform built on top of Django. This project automates your entire professional brand strategy on LinkedIn: onboarding profile analysis, AI multi-model content generation, automated daily posting, strategic commenting, smart networking, lead client hunting, and automated job applications.
 
-## Features
+---
 
-- **Script Management** — Create, edit, and organize Python scripts from your browser
-- **Flexible Scheduling** — Run scripts manually, at intervals, or daily at specific times
-- **Virtual Environments** — Isolated Python environments with custom pip packages per script
-- **Run History & Logs** — Track every execution with stdout/stderr capture
-- **Secrets Management** — Store encrypted environment variables and secrets
-- **Notifications** — Get alerts via email, webhook, or Telegram on script completion/failure
-- **Magic Link Auth** — Passwordless authentication via email
-- **Single Container** — Deploy with one Docker command
+## 🌟 Key Features
 
-## Quick Start
+1. **Intelligent Onboarding Wizard**
+   - A multi-step flow to configure professional goals, target industries, credentials, and custom content themes.
+   - Tailors an algorithmic LinkedIn growth strategy (e.g., *Thought Leader*, *Lead Generator*, *Job Hunter*, *Founders Brand*).
 
-### Using Docker Compose
+2. **Cost-Intelligent Multi-Model AI Router (`AIRouter`)**
+   - Lazily loads and balances queries across various providers based on pricing tiers:
+     - **Budget**: Groq (Llama 3) for high-speed, low-cost content.
+     - **Balanced**: Gemini 1.5 Pro & OpenAI (GPT-4o) for balanced quality.
+     - **Premium**: Anthropic (Claude 3.5 Sonnet) for peak copy and strategy.
+   - Text generation outputs tailored LinkedIn posts, contextual comments, custom connection pitches, and bespoke cover letters.
 
+3. **Graphic Post Visual Generator**
+   - Automatically generates eye-catching, non-realistic abstract graphic canvases overlaying key quotes or ideas from the post.
+   - Supports both programmatic Pillow-based designs and AI visual models (Stability AI, Replicate/Flux) to deliver visual depth.
+
+4. **Playwright Automation Engine**
+   - Robust browser automation scripts acting as a local background agent to perform human-like interactions:
+     - **Posting Engine**: Safely logs in, navigates to LinkedIn, publishes scheduled updates with generated images.
+     - **Contextual Commenter**: Searches for target industry topics and leaves thoughtful comments.
+     - **Network Builder**: Targets connections in the selected niche and sends personalized invites.
+     - **Job Applier**: Finds jobs matching keywords and applies with custom cover letters.
+     - **Lead Hunter**: Searches for specific buyer personas and gathers client leads.
+
+5. **Stripe Billing Integration**
+   - Out-of-the-box billing app with Tier plans (Free, Pro, Elite) linked to Stripe Checkout and webhooks.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework**: Django 6.0, Django-Q2 (Background Task Queue)
+- **Database**: SQLite (local dev) or PostgreSQL (production)
+- **Styling**: Tailwind CSS
+- **Automation**: Playwright (Headless Chromium)
+- **AI Engine**: OpenAI API, Anthropic API, Google Generative AI API, Groq, Stability AI, Replicate
+- **Graphics**: Pillow (PIL)
+
+---
+
+## 🚀 Quick Start
+
+### 1. Prerequisites
+- Python 3.10 or higher
+- Node.js (for Tailwind builds)
+- A Stripe account & API keys from AI providers (OpenAI, Anthropic, Gemini, Groq, Replicate, Stability AI)
+
+### 2. Installation
 ```bash
 # Clone the repository
-git clone https://github.com/hassancs91/PyRunner.git
-cd PyRunner
+git clone https://github.com/Teleiosite/LinkedIn-AI-Strategist.git
+cd LinkedIn-AI-Strategist
 
-# Copy environment template
-cp .env.example .env
+# Install packages
+pip install -r requirements.txt
 
-# Start PyRunner
-docker compose up -d
-
+# Install Playwright browser dependencies
+playwright install chromium
 ```
 
-Open `http://localhost:8000` in your browser.
-
-### Using Docker Hub Image
-
+### 3. Environment Variables
+Copy `.env.example` to `.env` and fill in your keys:
 ```bash
-docker run -d \
-  --name pyrunner \
-  -p 8000:8000 \
-  -v pyrunner_data:/app/data \
-  -e DEBUG=False \
-  -e ALLOWED_HOSTS=localhost \
-  hasanaboulhasan/pyrunner:latest
+cp .env.example .env
+```
+Ensure you set the Django `SECRET_KEY`, `ENCRYPTION_KEY` (for securing LinkedIn credentials), and chosen AI provider keys.
+
+### 4. Run Migrations & Setup
+```bash
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createsuperuser
 ```
 
-## Configuration
+### 5. Start the Application
+```bash
+# Start background workers (Django-Q)
+python manage.py qcluster
 
-Copy `.env.example` to `.env` and configure:
+# Start development server
+python manage.py runserver
+```
+Visit `http://127.0.0.1:8000` to onboard your strategist!
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `SECRET_KEY` | **Required** | Django secret key (container exits if unset — see [.env.example](.env.example)) |
-| `ENCRYPTION_KEY` | **Required** | Fernet key for encrypting stored secrets — save this somewhere safe |
-| `DEBUG` | `False` | Debug mode (disable in production) |
-| `ALLOWED_HOSTS` | `localhost,127.0.0.1` | Allowed hostnames |
-| `Q_WORKERS` | `2` | Background task workers |
+---
 
-See [.env.example](.env.example) for all options.
+## 🤖 Running Background Automation Scripts
+The scheduler run scripts are located in `linkedin/scripts/`. You can schedule them using the Django admin panel, Django-Q tasks, or standard cron jobs:
 
-## Tech Stack
+- **Daily Posting**: `python manage.py runscript post_publisher`
+- **Strategic Commenting**: `python manage.py runscript commenter`
+- **Network Growth**: `python manage.py runscript connection_builder`
+- **Job Hunting & Application**: `python manage.py runscript job_applier`
+- **Lead Generation / Prospecting**: `python manage.py runscript client_hunter`
+- **Weekly Strategy Audit & Reports**: `python manage.py runscript weekly_reporter`
 
-- **Backend**: Django, django-q2
-- **Frontend**: Tailwind CSS
-- **Database**: SQLite
-- **Deployment**: Docker
+---
 
-## Requirements
+## 🔒 Security & Safe Automation
+- We use Fernet symmetric encryption to store LinkedIn login credentials securely in the database.
+- Playwright sessions simulate human-like pauses, variable scroll actions, and randomized timings to mimic authentic user behaviors.
 
-- Docker Engine 20.10+
-- Docker Compose v2.0+
-- 1GB RAM minimum (2GB recommended)
-
-## License
-
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+## 📄 License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

@@ -2,7 +2,11 @@
 {% block title %}Content Queue | LinkedIn AI Strategist{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+<div class="flex">
+    {% include "cpanel/_sidebar.html" %}
+
+    <div class="flex-1 p-8 overflow-y-auto max-h-[calc(100vh-4rem)]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
     <!-- Header -->
     <div class="flex items-center justify-between pb-6 border-b border-code-border">
         <div>
@@ -160,6 +164,7 @@
                 <p class="text-sm text-code-muted py-4 text-center">No posts published yet.</p>
                 {% endfor %}
             </div>
+        </div>
         </div>
     </div>
 </div>

@@ -2,7 +2,11 @@
 {% block title %}Preview Post | LinkedIn AI Strategist{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+<div class="flex">
+    {% include "cpanel/_sidebar.html" %}
+
+    <div class="flex-1 p-8 overflow-y-auto max-h-[calc(100vh-4rem)]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
     <div class="mb-6 flex items-center justify-between">
         <a href="{% url 'linkedin:content_queue' %}" class="text-sm text-code-muted hover:text-white flex items-center">
             &larr; Back to Content Queue
@@ -129,6 +133,8 @@
                         <span class="font-bold text-code-text">Estimated Cost:</span> ${{ post.generation_cost_usd|floatformat:4 }} USD
                     </div>
                 </div>
+            </div>
+        </div>
             </div>
         </div>
     </div>

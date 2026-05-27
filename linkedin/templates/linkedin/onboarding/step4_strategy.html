@@ -2,7 +2,11 @@
 {% block title %}Onboarding - Review Strategy | LinkedIn AI Strategist{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto px-4 py-12">
+<div class="flex">
+    {% include "cpanel/_sidebar.html" %}
+
+    <div class="flex-1 p-8 overflow-y-auto max-h-[calc(100vh-4rem)]">
+        <div class="max-w-4xl mx-auto px-4 py-12">
     <!-- Progress Indicator -->
     <div class="mb-10">
         <div class="flex justify-between text-sm text-code-muted mb-2 font-mono">
@@ -78,6 +82,7 @@
                         </button>
                     </div>
                 </form>
+            </div>
             </div>
         </div>
     </div>

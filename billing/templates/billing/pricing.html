@@ -2,7 +2,11 @@
 {% block title %}Pricing Plans | LinkedIn AI Strategist{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-12">
+<div class="flex">
+    {% include "cpanel/_sidebar.html" %}
+
+    <div class="flex-1 p-8 overflow-y-auto max-h-[calc(100vh-4rem)]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-12">
     <!-- Header -->
     <div class="text-center space-y-4 max-w-3xl mx-auto">
         <h1 class="text-4xl font-extrabold text-white tracking-tight sm:text-5xl">Flexible Plans for Every LinkedIn Goal</h1>
@@ -92,4 +96,7 @@ function startCheckout(planSlug) {
     });
 }
 </script>
+        </div>
+    </div>
+</div>
 {% endblock %}

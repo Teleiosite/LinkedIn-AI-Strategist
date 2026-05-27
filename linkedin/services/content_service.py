@@ -1,20 +1,20 @@
 """
-ContentService: Generates LinkedIn post text using GPT-4o.
+ContentService: Generates LinkedIn post text using the AI Router.
 """
 import json
 import logging
-from openai import OpenAI
 
 from linkedin.models import LinkedInProfile, GeneratedPost
 from linkedin.services.prompt_engine import PromptEngine, UserContext
+from linkedin.services.ai_router import AIRouter
 
 logger = logging.getLogger(__name__)
 
 
 class ContentService:
 
-    def __init__(self, api_key: str):
-        self.client = OpenAI(api_key=api_key)
+    def __init__(self):
+        self.router = AIRouter()
 
     def generate_post(
         self,
@@ -24,7 +24,7 @@ class ContentService:
     ) -> dict:
         """
         Generate a LinkedIn post for the given profile.
-        Returns dict with post_text, hook, hashtags, core_message, target_emotion.
+        Returns dict with post_text, hook, hashtags, core_message, target_emotion, model, provider, cost_usd.
         """
         ctx = self._build_user_context(profile)
 
@@ -32,28 +32,23 @@ class ContentService:
         system_prompt = PromptEngine.get_system_prompt(ctx)
         user_prompt = PromptEngine.get_post_generation_prompt(post_type, recent_topics)
 
-        # Call GPT-4o
-        response = self.client.chat.completions.create(
-            model="gpt-4o",
+        # Call AI Router
+        response = self.router.complete(
+            task="post_generation",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ],
+            json_mode=True,
             temperature=0.8,
-            response_format={"type": "json_object"}
         )
 
-        result = json.loads(response.choices[0].message.content)
+        result = json.loads(response["text"])
+        result["cost_usd"] = response["cost_usd"]
+        result["model"] = response["model"]
+        result["provider"] = response["provider"]
 
-        # Track cost (approximate)
-        input_tokens = response.usage.prompt_tokens
-        output_tokens = response.usage.completion_tokens
-        cost = (input_tokens * 0.000005) + (output_tokens * 0.000015)
-
-        result["generation_cost_usd"] = cost
-        result["gpt_model_used"] = "gpt-4o"
-
-        logger.info(f"Generated {post_type} post for profile {profile.id}, cost: ${cost:.4f}")
+        logger.info(f"Generated {post_type} post for profile {profile.id}, cost: ${response['cost_usd']:.4f}")
         return result
 
     def generate_comment(
@@ -66,14 +61,14 @@ class ContentService:
         ctx = self._build_user_context(profile)
         prompt = PromptEngine.get_comment_prompt(ctx, target_post_text, target_author_name)
 
-        response = self.client.chat.completions.create(
-            model="gpt-4o",
+        response = self.router.complete(
+            task="comment_generation",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.7,
             max_tokens=200
         )
 
-        return response.choices[0].message.content.strip()
+        return response["text"].strip()
 
     def generate_connection_message(
         self,
@@ -89,14 +84,14 @@ class ContentService:
             ctx, target_name, target_headline, target_company, reason
         )
 
-        response = self.client.chat.completions.create(
-            model="gpt-4o",
+        response = self.router.complete(
+            task="connection_message",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.6,
             max_tokens=100
         )
 
-        return response.choices[0].message.content.strip()
+        return response["text"].strip()
 
     def generate_cover_letter(
         self,
@@ -111,14 +106,14 @@ class ContentService:
             ctx, job_title, company, job_description
         )
 
-        response = self.client.chat.completions.create(
-            model="gpt-4o",
+        response = self.router.complete(
+            task="cover_letter",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.6,
             max_tokens=400
         )
 
-        return response.choices[0].message.content.strip()
+        return response["text"].strip()
 
     def _build_user_context(self, profile: LinkedInProfile) -> UserContext:
         skills = [s.strip() for s in profile.skills.split(",") if s.strip()]

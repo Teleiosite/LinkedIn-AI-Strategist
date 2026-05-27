@@ -136,8 +136,13 @@ class SetupService:
         """
         from core.models import Environment
 
-        # Check if default environment already exists
-        existing = Environment.objects.filter(is_default=True).first()
+        env_path = "default"
+        # Check if default environment already exists by path
+        existing = Environment.objects.filter(path=env_path).first()
+        if existing and not existing.is_default:
+            existing.is_default = True
+            existing.save()
+
         needs_package_restore = False
         if existing:
             # Check if directory exists
@@ -151,9 +156,6 @@ class SetupService:
                 # Mark for package restoration if we have saved requirements
                 if existing.requirements:
                     needs_package_restore = True
-
-        # Define paths
-        env_path = "default"
         full_path = os.path.join(settings.ENVIRONMENTS_ROOT, env_path)
 
         # Check if directory already exists (orphaned)

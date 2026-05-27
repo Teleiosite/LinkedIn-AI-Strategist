@@ -392,3 +392,50 @@ API_RATE_LIMIT = int(os.environ.get("API_RATE_LIMIT", "60"))
 # CORS settings for API endpoints
 # Set to "*" to allow all origins (suitable for self-hosted), or comma-separated origins
 API_CORS_ORIGINS = os.environ.get("API_CORS_ORIGINS", "*")
+
+
+# =============================================================================
+# Stripe Settings
+# =============================================================================
+STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
+STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY", "")
+STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
+STRIPE_PRICE_JOB_SEEKER = os.environ.get("STRIPE_PRICE_JOB_SEEKER", "")
+STRIPE_PRICE_FREELANCER = os.environ.get("STRIPE_PRICE_FREELANCER", "")
+STRIPE_PRICE_PERSONAL_BRAND = os.environ.get("STRIPE_PRICE_PERSONAL_BRAND", "")
+STRIPE_PRICE_AGENCY = os.environ.get("STRIPE_PRICE_AGENCY", "")
+
+
+# =============================================================================
+# AI Provider Settings
+# =============================================================================
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+GOOGLE_AI_API_KEY = os.environ.get("GOOGLE_AI_API_KEY", "")
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
+STABILITY_API_KEY = os.environ.get("STABILITY_API_KEY", "")
+REPLICATE_API_TOKEN = os.environ.get("REPLICATE_API_TOKEN", "")
+
+# AI Router tier configuration
+AI_TIER_POST_GENERATION = os.environ.get("AI_TIER_POST_GENERATION", "balanced")
+AI_TIER_IMAGE_GENERATION = os.environ.get("AI_TIER_IMAGE_GENERATION", "balanced")
+AI_TIER_COMMENTS = os.environ.get("AI_TIER_COMMENTS", "budget")
+AI_TIER_CONNECTIONS = os.environ.get("AI_TIER_CONNECTIONS", "budget")
+AI_TIER_COVER_LETTERS = os.environ.get("AI_TIER_COVER_LETTERS", "balanced")
+AI_TIER_PROFILE_OPTIMIZATION = os.environ.get("AI_TIER_PROFILE_OPTIMIZATION", "premium")
+AI_TIER_VISUAL_BRIEF = os.environ.get("AI_TIER_VISUAL_BRIEF", "budget")
+
+
+# =============================================================================
+# Proxy Settings (for LinkedIn automation)
+# =============================================================================
+PROXY_HOST = os.environ.get("PROXY_HOST", "")
+PROXY_PORT = os.environ.get("PROXY_PORT", "")
+PROXY_USERNAME = os.environ.get("PROXY_USERNAME", "")
+PROXY_PASSWORD = os.environ.get("PROXY_PASSWORD", "")
+
+
+# =============================================================================
+# LinkedIn App Settings
+# =============================================================================
+LINKEDIN_APP_BASE_URL = os.environ.get("LINKEDIN_APP_BASE_URL", "http://localhost:8000")

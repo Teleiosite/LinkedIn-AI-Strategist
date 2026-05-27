@@ -4,7 +4,7 @@ from billing.models import Plan, Subscription
 
 @admin.register(Plan)
 class PlanAdmin(admin.ModelAdmin):
-    list_display = ["name", "price_monthly", "is_active", "sort_order"]
+    list_display = ["name", "price_monthly", "is_active"]
     list_filter = ["is_active"]
     prepopulated_fields = {"slug": ["name"]}
 

@@ -11,7 +11,12 @@ from datetime import timedelta
 
 from billing.models import Plan, Subscription
 
-stripe.api_key = settings.STRIPE_SECRET_KEY
+
+def _get_stripe():
+    """Return stripe with the API key configured. Called lazily inside views."""
+    stripe.api_key = getattr(settings, "STRIPE_SECRET_KEY", "")
+    return stripe
+
 
 
 @login_required
@@ -22,16 +27,24 @@ def pricing_view(request):
 
 
 @login_required
+def checkout_success(request):
+    """Show success page after Stripe checkout."""
+    subscription = Subscription.objects.filter(user=request.user).first()
+    return render(request, "billing/success.html", {"subscription": subscription})
+
+
+@login_required
 @require_POST
 def create_checkout_session(request):
     """Create Stripe checkout session for a plan."""
+    st = _get_stripe()
     plan_slug = request.POST.get("plan_slug")
     try:
         plan = Plan.objects.get(slug=plan_slug)
     except Plan.DoesNotExist:
         return JsonResponse({"error": "Invalid plan"}, status=400)
 
-    session = stripe.checkout.Session.create(
+    session = st.checkout.Session.create(
         payment_method_types=["card"],
         mode="subscription",
         customer_email=request.user.email,
@@ -53,12 +66,13 @@ def create_checkout_session(request):
 @csrf_exempt
 def stripe_webhook(request):
     """Handle Stripe webhooks to update subscription status."""
+    st = _get_stripe()
     payload = request.body
     sig_header = request.META.get("HTTP_STRIPE_SIGNATURE")
 
     try:
-        event = stripe.Webhook.construct_event(
-            payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
+        event = st.Webhook.construct_event(
+            payload, sig_header, getattr(settings, "STRIPE_WEBHOOK_SECRET", "")
         )
     except (ValueError, stripe.error.SignatureVerificationError):
         return HttpResponse(status=400)

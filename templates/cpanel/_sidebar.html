@@ -76,6 +76,48 @@
         <!-- Divider -->
         <div class="my-4 border-t border-code-border"></div>
 
+        <!-- Section Title: AI STRATEGIST -->
+        <div class="px-4 py-1 text-xs font-semibold text-code-accent uppercase tracking-wider">AI Strategist</div>
+
+        <!-- LinkedIn Dashboard -->
+        <a href="{% url 'linkedin:dashboard' %}"
+           class="flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors {% if request.resolver_match.namespace == 'linkedin' and request.resolver_match.url_name == 'dashboard' %}bg-code-accent/20 text-code-accent{% else %}text-code-muted hover:text-code-text hover:bg-code-bg{% endif %}">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+            <span>LinkedIn Dashboard</span>
+        </a>
+
+        <!-- Content Queue -->
+        <a href="{% url 'linkedin:content_queue' %}"
+           class="flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors {% if request.resolver_match.namespace == 'linkedin' and 'content' in request.resolver_match.url_name %}bg-code-accent/20 text-code-accent{% else %}text-code-muted hover:text-code-text hover:bg-code-bg{% endif %}">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+            </svg>
+            <span>Content Queue</span>
+        </a>
+
+        <!-- Setup / Onboarding -->
+        <a href="{% url 'linkedin:onboarding_step1' %}"
+           class="flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors {% if request.resolver_match.namespace == 'linkedin' and 'onboarding' in request.resolver_match.url_name %}bg-code-accent/20 text-code-accent{% else %}text-code-muted hover:text-code-text hover:bg-code-bg{% endif %}">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+            </svg>
+            <span>LinkedIn Setup</span>
+        </a>
+
+        <!-- Billing & Plans -->
+        <a href="{% url 'billing:pricing' %}"
+           class="flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors {% if request.resolver_match.namespace == 'billing' %}bg-code-accent/20 text-code-accent{% else %}text-code-muted hover:text-code-text hover:bg-code-bg{% endif %}">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+            </svg>
+            <span>Billing & Plans</span>
+        </a>
+
+        <!-- Divider -->
+        <div class="my-4 border-t border-code-border"></div>
+
         <!-- Settings -->
         <a href="{% url 'cpanel:settings' %}"
            class="flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors {% if 'settings' in request.resolver_match.url_name %}bg-code-accent/20 text-code-accent{% else %}text-code-muted hover:text-code-text hover:bg-code-bg{% endif %}">

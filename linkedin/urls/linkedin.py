@@ -15,6 +15,7 @@ urlpatterns = [
 
     # Content
     path("content/", content.content_queue_view, name="content_queue"),
+    path("content/generate/", content.generate_post_now_view, name="generate_post_now"),
     path("content/<uuid:pk>/preview/", content.post_preview_view, name="post_preview"),
     path("content/<uuid:pk>/approve/", content.approve_post_view, name="approve_post"),
     path("content/<uuid:pk>/reject/", content.reject_post_view, name="reject_post"),

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Pricing Plans | LinkedIn AI Strategist{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-12">
+    <!-- Header -->
+    <div class="text-center space-y-4 max-w-3xl mx-auto">
+        <h1 class="text-4xl font-extrabold text-white tracking-tight sm:text-5xl">Flexible Plans for Every LinkedIn Goal</h1>
+        <p class="text-lg text-code-muted">Activate a strategist plan to unlock automation modules. Every plan includes a 14-day free trial.</p>
+    </div>
+
+    <!-- Pricing Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        {% for plan in plans %}
+        <div class="bg-code-surface border border-code-border hover:border-code-accent/30 rounded-2xl p-8 flex flex-col justify-between shadow-xl relative transition-all duration-300 group
+             {% if plan.slug == 'freelancer' or plan.slug == 'brand_builder' %}ring-2 ring-code-accent/50 bg-code-surface/80{% endif %}">
+            
+            {% if plan.slug == 'freelancer' or plan.slug == 'brand_builder' %}
+            <span class="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 bg-code-accent text-code-bg font-extrabold text-[10px] tracking-wider uppercase rounded-full font-mono shadow-md">
+                RECOMMENDED
+            </span>
+            {% endif %}
+
+            <div class="space-y-6">
+                <div>
+                    <h3 class="text-xl font-bold text-white group-hover:text-code-accent transition-colors">{{ plan.name }}</h3>
+                    <p class="text-xs text-code-muted mt-1 leading-relaxed">{{ plan.description }}</p>
+                </div>
+
+                <div class="flex items-baseline text-white">
+                    <span class="text-4xl font-extrabold tracking-tight">${{ plan.price_monthly }}</span>
+                    <span class="ml-1 text-sm font-semibold text-code-muted">/mo</span>
+                </div>
+
+                <!-- Features -->
+                <ul class="space-y-3 pt-6 border-t border-code-border text-sm">
+                    {% for feature in plan.features %}
+                    <li class="flex items-center text-code-text">
+                        <svg class="w-4 h-4 text-green-500 mr-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        {{ feature }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Checkout Action -->
+            <div class="pt-8">
+                {% if current_subscription and current_subscription.plan == plan %}
+                <button disabled class="w-full py-3 bg-code-surface text-code-muted font-bold rounded-xl border border-code-border text-sm cursor-not-allowed">
+                    Current Active Plan
+                </button>
+                {% else %}
+                <button onclick="startCheckout('{{ plan.slug }}')" class="w-full py-3 bg-gradient-to-r from-code-accent to-pink-600 hover:brightness-110 text-white font-bold rounded-xl shadow-md hover:shadow-code-accent/15 active:scale-[0.98] transition-all text-sm">
+                    Start 14-day Free Trial
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+function startCheckout(planSlug) {
+    // Show loading indicator/block if needed
+    const formData = new FormData();
+    formData.append('plan_slug', planSlug);
+    
+    // Fetch CSRF token
+    const csrfToken = '{{ csrf_token }}';
+    
+    fetch("{% url 'billing:checkout' %}", {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.checkout_url) {
+            window.location.href = data.checkout_url;
+        } else if (data.error) {
+            alert('Checkout failed: ' + data.error);
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('An unexpected error occurred during checkout setup.');
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | LinkedIn AI Strategist{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-6 border-b border-code-border">
+        <div>
+            <h1 class="text-3xl font-extrabold text-white tracking-tight">LinkedIn AI Strategist</h1>
+            <p class="text-code-muted mt-1">Welcome back! Manage your automated LinkedIn strategist strategy and check performance metrics.</p>
+        </div>
+        <div class="flex items-center space-x-3">
+            <a href="{% url 'linkedin:content_queue' %}" class="px-5 py-2.5 bg-code-surface border border-code-border text-white font-semibold rounded-xl hover:bg-code-bg transition-all duration-150">
+                View Content Queue
+            </a>
+            <form method="post" action="{% url 'linkedin:generate_post_now' %}">
+                {% csrf_token %}
+                <button type="submit" class="px-5 py-2.5 bg-gradient-to-r from-code-accent to-pink-600 text-white font-bold rounded-xl shadow-lg hover:shadow-code-accent/20 hover:brightness-110 active:scale-95 transition-all duration-150">
+                    Generate AI Post Now
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Quick Stats Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="p-6 bg-code-surface border border-code-border rounded-2xl shadow-xl relative overflow-hidden group">
+            <span class="block text-xs font-bold text-code-muted uppercase tracking-wider font-mono">Total Posts Generated</span>
+            <span class="block text-3xl font-extrabold text-white mt-2">{{ total_posts }}</span>
+            <span class="block text-xs text-green-400 font-mono mt-1">{{ posted_posts }} published on LinkedIn</span>
+        </div>
+
+        <div class="p-6 bg-code-surface border border-code-border rounded-2xl shadow-xl relative overflow-hidden group">
+            <span class="block text-xs font-bold text-code-muted uppercase tracking-wider font-mono">Leads Identified</span>
+            <span class="block text-3xl font-extrabold text-white mt-2">{{ leads_count }}</span>
+            <span class="block text-xs text-code-muted font-mono mt-1">Hunted by strategy agents</span>
+        </div>
+
+        <div class="p-6 bg-code-surface border border-code-border rounded-2xl shadow-xl relative overflow-hidden group">
+            <span class="block text-xs font-bold text-code-muted uppercase tracking-wider font-mono">Jobs Applied To</span>
+            <span class="block text-3xl font-extrabold text-white mt-2">{{ apps_count }}</span>
+            <span class="block text-xs text-code-muted font-mono mt-1">Easy Apply submissions</span>
+        </div>
+
+        <div class="p-6 bg-code-surface border border-code-border rounded-2xl shadow-xl relative overflow-hidden group">
+            <span class="block text-xs font-bold text-code-muted uppercase tracking-wider font-mono">Connections Count</span>
+            <span class="block text-3xl font-extrabold text-white mt-2">{{ profile.connections_count }}</span>
+            <span class="block text-xs text-green-400 font-mono mt-1">Connected account size</span>
+        </div>
+    </div>
+
+    <!-- Main Content Area Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Strategy and Module Controls -->
+        <div class="bg-code-surface border border-code-border rounded-2xl p-6 shadow-xl space-y-6 h-fit">
+            <div>
+                <h2 class="text-lg font-bold text-white">Active Modules</h2>
+                <p class="text-xs text-code-muted mt-1">Toggle strategist modules on or off. Changes deploy instantly to scheduler.</p>
+            </div>
+
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update_modules">
+
+                <label class="flex items-center justify-between p-3 bg-code-bg rounded-xl border border-code-border/50 cursor-pointer hover:border-code-border transition-all">
+                    <div>
+                        <span class="block text-sm font-bold text-white">AI Posting Module</span>
+                        <span class="block text-[11px] text-code-muted mt-0.5">Posts 3x/week with matched visual</span>
+                    </div>
+                    <input type="checkbox" name="module_posting" {% if profile.module_posting %}checked{% endif %} class="text-code-accent focus:ring-code-accent bg-code-bg border-code-border rounded w-5 h-5">
+                </label>
+
+                <label class="flex items-center justify-between p-3 bg-code-bg rounded-xl border border-code-border/50 cursor-pointer hover:border-code-border transition-all">
+                    <div>
+                        <span class="block text-sm font-bold text-white">Auto-Commenting Module</span>
+                        <span class="block text-[11px] text-code-muted mt-0.5">Auto-responds to industry influencers</span>
+                    </div>
+                    <input type="checkbox" name="module_commenting" {% if profile.module_commenting %}checked{% endif %} class="text-code-accent focus:ring-code-accent bg-code-bg border-code-border rounded w-5 h-5">
+                </label>
+
+                <label class="flex items-center justify-between p-3 bg-code-bg rounded-xl border border-code-border/50 cursor-pointer hover:border-code-border transition-all">
+                    <div>
+                        <span class="block text-sm font-bold text-white">Connection Building Module</span>
+                        <span class="block text-[11px] text-code-muted mt-0.5">Personalized connection notes</span>
+                    </div>
+                    <input type="checkbox" name="module_connecting" {% if profile.module_connecting %}checked{% endif %} class="text-code-accent focus:ring-code-accent bg-code-bg border-code-border rounded w-5 h-5">
+                </label>
+
+                <label class="flex items-center justify-between p-3 bg-code-bg rounded-xl border border-code-border/50 cursor-pointer hover:border-code-border transition-all">
+                    <div>
+                        <span class="block text-sm font-bold text-white">Job Applying Module</span>
+                        <span class="block text-[11px] text-code-muted mt-0.5">Submits applications with custom cover letters</span>
+                    </div>
+                    <input type="checkbox" name="module_job_applying" {% if profile.module_job_applying %}checked{% endif %} class="text-code-accent focus:ring-code-accent bg-code-bg border-code-border rounded w-5 h-5">
+                </label>
+
+                <label class="flex items-center justify-between p-3 bg-code-bg rounded-xl border border-code-border/50 cursor-pointer hover:border-code-border transition-all">
+                    <div>
+                        <span class="block text-sm font-bold text-white">Client Hunting Module</span>
+                        <span class="block text-[11px] text-code-muted mt-0.5">Find and DM high-ticket prospects</span>
+                    </div>
+                    <input type="checkbox" name="module_client_hunting" {% if profile.module_client_hunting %}checked{% endif %} class="text-code-accent focus:ring-code-accent bg-code-bg border-code-border rounded w-5 h-5">
+                </label>
+
+                <button type="submit" class="w-full py-2.5 bg-code-bg border border-code-border hover:border-code-accent text-white font-bold rounded-xl transition-all">
+                    Save Module Configuration
+                </button>
+            </form>
+        </div>
+
+        <!-- Recent Activity Feed (Posts & Leads) -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Recent Generated Posts Queue -->
+            <div class="bg-code-surface border border-code-border rounded-2xl p-6 shadow-xl">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-bold text-white">Recent Content Queue</h2>
+                    <a href="{% url 'linkedin:content_queue' %}" class="text-xs text-code-accent hover:underline">View All &rarr;</a>
+                </div>
+
+                <div class="space-y-3">
+                    {% for post in recent_posts %}
+                    <div class="p-4 bg-code-bg border border-code-border/60 rounded-xl flex items-center justify-between gap-4">
+                        <div class="truncate">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono tracking-wider uppercase bg-code-surface border border-code-border text-code-accent">
+                                {% if post.post_type == 'thought_leadership' %}Thought Leadership
+                                {% elif post.post_type == 'personal_story' %}Personal Story
+                                {% elif post.post_type == 'industry_insight' %}Industry Insight
+                                {% elif post.post_type == 'achievement' %}Achievement
+                                {% elif post.post_type == 'tip_framework' %}Tip & Framework
+                                {% elif post.post_type == 'hot_take' %}Hot Take
+                                {% elif post.post_type == 'case_study' %}Case Study
+                                {% else %}{{ post.post_type }}
+                                {% endif %}
+                            </span>
+                            <p class="text-sm text-code-text truncate mt-1.5">{{ post.hook|default:post.post_text }}</p>
+                        </div>
+                        <div class="flex items-center space-x-2 shrink-0">
+                            <span class="text-xs font-mono px-2 py-1 rounded capitalize
+                                {% if post.status == 'posted' %}bg-green-500/10 text-green-400 border border-green-500/20
+                                {% elif post.status == 'draft' %}bg-yellow-500/10 text-yellow-400 border border-yellow-500/20
+                                {% elif post.status == 'approved' %}bg-blue-500/10 text-blue-400 border border-blue-500/20
+                                {% else %}bg-code-surface text-code-muted border border-code-border
+                                {% endif %}">
+                                {{ post.status }}
+                            </span>
+                            <a href="{% url 'linkedin:post_preview' post.id %}" class="p-1 bg-code-surface hover:bg-code-bg border border-code-border rounded text-code-muted hover:text-white transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-sm text-code-muted py-4 text-center">No posts generated yet. Click "Generate AI Post Now" above.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Recent Leads Hunted -->
+            <div class="bg-code-surface border border-code-border rounded-2xl p-6 shadow-xl">
+                <h2 class="text-lg font-bold text-white mb-4">Recent Leads Identified</h2>
+                <div class="space-y-3">
+                    {% for lead in recent_leads %}
+                    <div class="p-4 bg-code-bg border border-code-border/60 rounded-xl flex items-center justify-between gap-4">
+                        <div class="truncate">
+                            <span class="block text-sm font-bold text-white">{{ lead.name }}</span>
+                            <span class="block text-xs text-code-muted mt-0.5 truncate">{{ lead.headline }} @ {{ lead.company }}</span>
+                        </div>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono tracking-wider uppercase bg-code-surface border border-code-border text-code-accent shrink-0">
+                            {{ lead.stage }}
+                        </span>
+                    </div>
+                    {% empty %}
+                    <p class="text-sm text-code-muted py-4 text-center">No leads identified yet. Activate the Client Hunting module.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

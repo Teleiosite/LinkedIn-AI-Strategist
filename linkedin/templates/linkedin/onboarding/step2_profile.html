@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Onboarding - Profile | LinkedIn AI Strategist{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-12">
+    <!-- Progress Indicator -->
+    <div class="mb-10">
+        <div class="flex justify-between text-sm text-code-muted mb-2 font-mono">
+            <span>STEP 2 OF 4</span>
+            <span class="text-code-accent font-bold">50% COMPLETE</span>
+        </div>
+        <div class="w-full h-2 bg-code-surface rounded-full overflow-hidden border border-code-border">
+            <div class="h-full bg-gradient-to-r from-code-accent to-pink-500 rounded-full transition-all duration-500" style="width: 50%"></div>
+        </div>
+    </div>
+
+    <!-- Onboarding Card -->
+    <div class="bg-code-surface border border-code-border rounded-2xl p-8 md:p-10 shadow-2xl relative overflow-hidden">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-code-accent/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="relative">
+            <h1 class="text-3xl font-extrabold tracking-tight text-white mb-2">Build Your AI Context Profile</h1>
+            <p class="text-code-muted mb-8 text-lg">Our AI uses this information to write posts in your voice and target the correct prospects.</p>
+
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+
+                <!-- Industry & Role Row -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label for="target_industry" class="block text-xs font-bold tracking-wider text-code-muted uppercase font-mono">Target Industry</label>
+                        <input type="text" id="target_industry" name="target_industry" required
+                               placeholder="e.g. B2B SaaS, Artificial Intelligence"
+                               class="w-full px-4 py-3 bg-code-bg border border-code-border hover:border-code-muted focus:border-code-accent focus:ring-1 focus:ring-code-accent rounded-xl text-white outline-none transition-all duration-200"
+                               value="{{ data.target_industry|default:'' }}">
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="target_role" class="block text-xs font-bold tracking-wider text-code-muted uppercase font-mono">Target Role / Designation</label>
+                        <input type="text" id="target_role" name="target_role" required
+                               placeholder="e.g. Senior Product Manager, Founder"
+                               class="w-full px-4 py-3 bg-code-bg border border-code-border hover:border-code-muted focus:border-code-accent focus:ring-1 focus:ring-code-accent rounded-xl text-white outline-none transition-all duration-200"
+                               value="{{ data.target_role|default:'' }}">
+                    </div>
+                </div>
+
+                <!-- Location & Watermark -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label for="target_location" class="block text-xs font-bold tracking-wider text-code-muted uppercase font-mono">Target Location (Optional)</label>
+                        <input type="text" id="target_location" name="target_location"
+                               placeholder="e.g. San Francisco Bay Area, United States"
+                               class="w-full px-4 py-3 bg-code-bg border border-code-border hover:border-code-muted focus:border-code-accent focus:ring-1 focus:ring-code-accent rounded-xl text-white outline-none transition-all duration-200"
+                               value="{{ data.target_location|default:'' }}">
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="brand_watermark_text" class="block text-xs font-bold tracking-wider text-code-muted uppercase font-mono">Image Watermark Text (Optional)</label>
+                        <input type="text" id="brand_watermark_text" name="brand_watermark_text"
+                               placeholder="e.g. @yourname"
+                               class="w-full px-4 py-3 bg-code-bg border border-code-border hover:border-code-muted focus:border-code-accent focus:ring-1 focus:ring-code-accent rounded-xl text-white outline-none transition-all duration-200"
+                               value="{{ data.brand_watermark_text|default:'' }}">
+                        <p class="text-[10px] text-code-muted font-mono">Will be overlayed on all custom abstract generated images.</p>
+                    </div>
+                </div>
+
+                <!-- Skills -->
+                <div class="space-y-2">
+                    <label for="skills" class="block text-xs font-bold tracking-wider text-code-muted uppercase font-mono">Key Skills (comma-separated)</label>
+                    <input type="text" id="skills" name="skills" required
+                           placeholder="e.g. Python, Product Strategy, Cloud Computing, Growth Marketing"
+                           class="w-full px-4 py-3 bg-code-bg border border-code-border hover:border-code-muted focus:border-code-accent focus:ring-1 focus:ring-code-accent rounded-xl text-white outline-none transition-all duration-200"
+                           value="{{ data.skills|default:'' }}">
+                </div>
+
+                <!-- Biography -->
+                <div class="space-y-2">
+                    <label for="bio_summary" class="block text-xs font-bold tracking-wider text-code-muted uppercase font-mono">Brief Background / Voice Sample</label>
+                    <textarea id="bio_summary" name="bio_summary" required rows="5"
+                              placeholder="Write a few paragraphs about your background, career wins, and writing style. The more detailed, the better the AI can copy your authentic tone."
+                              class="w-full px-4 py-3 bg-code-bg border border-code-border hover:border-code-muted focus:border-code-accent focus:ring-1 focus:ring-code-accent rounded-xl text-white outline-none resize-none transition-all duration-200">{{ data.bio_summary|default:'' }}</textarea>
+                </div>
+
+                <!-- Action Button -->
+                <div class="flex justify-between pt-6 border-t border-code-border">
+                    <a href="{% url 'linkedin:onboarding_step1' %}" class="px-6 py-3 bg-code-surface border border-code-border text-white font-semibold rounded-xl hover:bg-code-bg transition-all duration-150">
+                        &larr; Back
+                    </a>
+                    <button type="submit" class="px-8 py-3 bg-gradient-to-r from-code-accent to-pink-600 text-white font-bold rounded-xl shadow-lg hover:shadow-code-accent/20 hover:brightness-110 active:scale-95 transition-all duration-150">
+                        Continue to LinkedIn connection &rarr;
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

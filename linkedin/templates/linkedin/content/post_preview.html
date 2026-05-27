@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block title %}Preview Post | LinkedIn AI Strategist{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="mb-6 flex items-center justify-between">
+        <a href="{% url 'linkedin:content_queue' %}" class="text-sm text-code-muted hover:text-white flex items-center">
+            &larr; Back to Content Queue
+        </a>
+        <div class="flex items-center space-x-2">
+            {% if post.status == 'draft' %}
+            <a href="{% url 'linkedin:approve_post' post.id %}" class="px-5 py-2.5 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl shadow-lg hover:shadow-green-500/20 active:scale-95 transition-all text-sm">
+                Approve Post
+            </a>
+            <a href="{% url 'linkedin:reject_post' post.id %}" class="px-5 py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-xl text-white font-bold transition-all text-sm">
+                Reject Post
+            </a>
+            {% elif post.status == 'approved' %}
+            <a href="{% url 'linkedin:reject_post' post.id %}" class="px-5 py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-xl text-white font-bold transition-all text-sm">
+                Cancel Publication
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Layout Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Mock LinkedIn Post Card -->
+        <div class="lg:col-span-2 space-y-4">
+            <h2 class="text-sm font-bold text-code-muted tracking-wider uppercase font-mono mb-2">LinkedIn Live Preview Mock</h2>
+            <div class="bg-white text-gray-900 border border-gray-200 rounded-xl shadow-md overflow-hidden max-w-[550px] mx-auto">
+                <!-- Card Header -->
+                <div class="p-4 flex items-center space-x-3">
+                    <div class="w-12 h-12 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center font-bold text-gray-600 overflow-hidden">
+                        {% if profile.profile_picture_url %}
+                        <img src="{{ profile.profile_picture_url }}" alt="Profile Pic" class="w-full h-full object-cover">
+                        {% else %}
+                        {{ profile.linkedin_name|default:request.user.email|slice:":2"|upper }}
+                        {% endif %}
+                    </div>
+                    <div>
+                        <span class="block font-bold text-sm text-gray-900 hover:text-blue-700 cursor-pointer">{{ profile.linkedin_name|default:request.user.email }}</span>
+                        <span class="block text-xs text-gray-500 truncate max-w-[400px]">{{ profile.linkedin_headline|default:profile.target_role }}</span>
+                        <span class="block text-[10px] text-gray-400 mt-0.5">1h • Edited • 🌐</span>
+                    </div>
+                </div>
+
+                <!-- Post Text -->
+                <div class="px-4 pb-3 text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">{{ post.post_text }}</div>
+
+                <!-- Post Visual -->
+                {% if post.image_local_path %}
+                <div class="border-t border-b border-gray-100 bg-gray-50 relative overflow-hidden aspect-[1200/628]">
+                    <img src="/{{ post.image_local_path }}" alt="Post Visual" class="w-full h-full object-cover">
+                </div>
+                {% elif post.image_url %}
+                <div class="border-t border-b border-gray-100 bg-gray-50 relative overflow-hidden aspect-[1200/628]">
+                    <img src="{{ post.image_url }}" alt="Post Visual" class="w-full h-full object-cover">
+                </div>
+                {% endif %}
+
+                <!-- Feed Reactions -->
+                <div class="px-4 py-2 border-b border-gray-100 flex items-center justify-between text-xs text-gray-500">
+                    <div class="flex items-center space-x-1">
+                        <span class="text-blue-500 font-bold">👍</span>
+                        <span class="text-red-500">❤️</span>
+                        <span class="text-yellow-500">👏</span>
+                        <span>42 reactions</span>
+                    </div>
+                    <div>
+                        <span>8 comments • 2 shares</span>
+                    </div>
+                </div>
+
+                <!-- Feed Interaction Buttons -->
+                <div class="px-4 py-1 flex justify-around text-gray-500 font-bold text-xs">
+                    <button class="flex items-center py-2 px-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <span class="mr-2">👍</span> Like
+                    </button>
+                    <button class="flex items-center py-2 px-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <span class="mr-2">💬</span> Comment
+                    </button>
+                    <button class="flex items-center py-2 px-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <span class="mr-2">🔁</span> Repost
+                    </button>
+                    <button class="flex items-center py-2 px-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <span class="mr-2">✉️</span> Send
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metadata / AI Brief Card -->
+        <div class="bg-code-surface border border-code-border rounded-2xl p-6 shadow-xl space-y-6 h-fit">
+            <div>
+                <h3 class="text-sm font-bold text-code-accent tracking-wider uppercase font-mono">AI Creative Brief</h3>
+                <p class="text-xs text-code-muted mt-1">Details generated during visual brief extraction.</p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="p-3 bg-code-bg rounded-xl border border-code-border/50 text-xs">
+                    <span class="block font-bold text-code-muted uppercase font-mono text-[10px]">Dominant Emotion</span>
+                    <span class="block text-white font-semibold mt-1 capitalize">{{ post.image_emotion|default:"Confidence" }}</span>
+                </div>
+
+                <div class="p-3 bg-code-bg rounded-xl border border-code-border/50 text-xs">
+                    <span class="block font-bold text-code-muted uppercase font-mono text-[10px]">Visual Metaphor</span>
+                    <span class="block text-white font-semibold mt-1">{{ post.image_metaphor|default:"Abstract geometric composition" }}</span>
+                </div>
+
+                <div class="p-3 bg-code-bg rounded-xl border border-code-border/50 text-xs">
+                    <span class="block font-bold text-code-muted uppercase font-mono text-[10px]">Color Mood</span>
+                    <span class="block text-white font-semibold mt-1">{{ post.image_color_palette }}</span>
+                </div>
+
+                <div class="p-3 bg-code-bg rounded-xl border border-code-border/50 text-xs">
+                    <span class="block font-bold text-code-muted uppercase font-mono text-[10px]">AI Prompt Used (Text-to-Image)</span>
+                    <p class="text-code-muted text-[11px] font-mono leading-relaxed mt-2 select-all whitespace-pre-wrap">{{ post.image_prompt_used }}</p>
+                </div>
+
+                <div class="pt-4 border-t border-code-border/50 space-y-2 text-xs font-mono text-code-muted">
+                    <div>
+                        <span class="font-bold text-code-text">Text Model:</span> {{ post.text_model_used }} ({{ post.text_provider }})
+                    </div>
+                    <div>
+                        <span class="font-bold text-code-text">Image Model:</span> {{ post.image_model_used }} ({{ post.image_provider }})
+                    </div>
+                    <div>
+                        <span class="font-bold text-code-text">Estimated Cost:</span> ${{ post.generation_cost_usd|floatformat:4 }} USD
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

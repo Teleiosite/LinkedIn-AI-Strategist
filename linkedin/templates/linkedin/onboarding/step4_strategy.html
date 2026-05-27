@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Onboarding - Review Strategy | LinkedIn AI Strategist{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-12">
+    <!-- Progress Indicator -->
+    <div class="mb-10">
+        <div class="flex justify-between text-sm text-code-muted mb-2 font-mono">
+            <span>STEP 4 OF 4</span>
+            <span class="text-code-accent font-bold">100% COMPLETE</span>
+        </div>
+        <div class="w-full h-2 bg-code-surface rounded-full overflow-hidden border border-code-border">
+            <div class="h-full bg-gradient-to-r from-code-accent to-pink-500 rounded-full transition-all duration-500" style="width: 100%"></div>
+        </div>
+    </div>
+
+    <!-- Onboarding Card -->
+    <div class="bg-code-surface border border-code-border rounded-2xl p-8 md:p-10 shadow-2xl relative overflow-hidden">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-code-accent/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="relative">
+            <h1 class="text-3xl font-extrabold tracking-tight text-white mb-2">Review Your Generated Strategy</h1>
+            <p class="text-code-muted mb-8 text-lg">Here is how the AI will automate your LinkedIn presence based on your settings.</p>
+
+            <div class="space-y-6">
+                <!-- Summary Card -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-5 bg-code-bg border border-code-border rounded-xl">
+                        <span class="block text-xs font-bold text-code-muted uppercase tracking-wider font-mono">Primary Goal</span>
+                        <span class="block text-lg font-bold text-white mt-1">
+                            {% if data.goal == 'get_job' %}Get a Job
+                            {% elif data.goal == 'get_clients' %}Get Clients
+                            {% elif data.goal == 'build_brand' %}Build Personal Brand
+                            {% elif data.goal == 'grow_business' %}Grow My Business
+                            {% else %}{{ data.goal }}
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="p-5 bg-code-bg border border-code-border rounded-xl">
+                        <span class="block text-xs font-bold text-code-muted uppercase tracking-wider font-mono">Industry Focus</span>
+                        <span class="block text-lg font-bold text-white mt-1">{{ data.target_industry }}</span>
+                    </div>
+                </div>
+
+                <!-- Strategy Action List -->
+                <div class="p-6 bg-code-bg border border-code-border rounded-xl space-y-4">
+                    <h3 class="text-sm font-bold text-code-accent tracking-wider uppercase font-mono">Daily / Weekly Action Plan</h3>
+                    <ul class="space-y-3">
+                        {% for action in strategy.actions %}
+                        <li class="flex items-center text-sm text-code-text">
+                            <svg class="w-5 h-5 text-green-500 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            {{ action }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono text-code-muted p-4 bg-code-bg/30 border border-code-border/50 rounded-xl">
+                    <div>
+                        <span class="font-bold text-code-text">Posting frequency:</span> {{ strategy.posts_per_week }} posts / week
+                    </div>
+                    <div>
+                        <span class="font-bold text-code-text">First scheduled post:</span> {{ strategy.first_post_time }}
+                    </div>
+                </div>
+
+                <form method="post" class="pt-6 border-t border-code-border">
+                    {% csrf_token %}
+
+                    <div class="flex justify-between items-center">
+                        <a href="{% url 'linkedin:onboarding_step3' %}" class="px-6 py-3 bg-code-surface border border-code-border text-white font-semibold rounded-xl hover:bg-code-bg transition-all duration-150">
+                            &larr; Back
+                        </a>
+                        <button type="submit" class="px-10 py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-extrabold rounded-xl shadow-lg hover:shadow-green-500/20 hover:brightness-110 active:scale-95 transition-all duration-150">
+                            Activate My Strategist &rarr;
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Onboarding - Goal | LinkedIn AI Strategist{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-12">
+    <!-- Progress Indicator -->
+    <div class="mb-10">
+        <div class="flex justify-between text-sm text-code-muted mb-2 font-mono">
+            <span>STEP 1 OF 4</span>
+            <span class="text-code-accent font-bold">25% COMPLETE</span>
+        </div>
+        <div class="w-full h-2 bg-code-surface rounded-full overflow-hidden border border-code-border">
+            <div class="h-full bg-gradient-to-r from-code-accent to-pink-500 rounded-full transition-all duration-500" style="width: 25%"></div>
+        </div>
+    </div>
+
+    <!-- Onboarding Card -->
+    <div class="bg-code-surface border border-code-border rounded-2xl p-8 md:p-10 shadow-2xl relative overflow-hidden">
+        <!-- Decorative Glow -->
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-code-accent/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="relative">
+            <h1 class="text-3xl font-extrabold tracking-tight text-white mb-2">Define your LinkedIn Strategy</h1>
+            <p class="text-code-muted mb-8 text-lg">Select your primary goal and aggressiveness level to initialize your custom AI agents.</p>
+
+            <form method="post" class="space-y-8">
+                {% csrf_token %}
+
+                <!-- Goals Grid -->
+                <div class="space-y-4">
+                    <label class="block text-sm font-semibold tracking-wider text-code-muted uppercase font-mono">Select Your Primary Goal</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {% for value, label in goals %}
+                        <label class="relative flex flex-col p-6 bg-code-bg border border-code-border hover:border-code-accent/50 rounded-xl cursor-pointer transition-all duration-300 group focus-within:ring-2 focus-within:ring-code-accent">
+                            <input type="radio" name="goal" value="{{ value }}" class="absolute right-4 top-4 text-code-accent focus:ring-code-accent bg-code-bg border-code-border w-5 h-5" {% if forloop.first %}checked{% endif %}>
+                            <span class="text-lg font-bold text-white mb-1 group-hover:text-code-accent transition-colors">{{ label }}</span>
+                            <span class="text-sm text-code-muted">
+                                {% if value == 'get_job' %}
+                                Land interviews, attract recruiters, and build professional trust.
+                                {% elif value == 'get_clients' %}
+                                Generate high-ticket inbound leads and book consultation calls.
+                                {% elif value == 'build_brand' %}
+                                Establish thought leadership, increase reach, and expand influence.
+                                {% elif value == 'grow_business' %}
+                                Raise awareness for your startup/agency and attract partnerships.
+                                {% endif %}
+                            </span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Aggression Levels -->
+                <div class="space-y-4 pt-4 border-t border-code-border">
+                    <label class="block text-sm font-semibold tracking-wider text-code-muted uppercase font-mono">Automation Aggression Level</label>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {% for value, label in aggression_levels %}
+                        <label class="relative flex items-start p-5 bg-code-bg border border-code-border hover:border-code-accent/30 rounded-xl cursor-pointer transition-all duration-200">
+                            <input type="radio" name="aggression" value="{{ value }}" class="mt-1 text-code-accent focus:ring-code-accent bg-code-bg border-code-border w-4 h-4" {% if value == 'balanced' %}checked{% endif %}>
+                            <div class="ml-3">
+                                <span class="block text-sm font-bold text-white">{{ label }}</span>
+                                <span class="block text-xs text-code-muted mt-0.5">
+                                    {% if value == 'conservative' %}
+                                    10-15 actions/day. Safe, organic.
+                                    {% elif value == 'balanced' %}
+                                    25-35 actions/day. Optimized.
+                                    {% elif value == 'aggressive' %}
+                                    50+ actions/day. High volume.
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <div class="flex justify-end pt-6">
+                    <button type="submit" class="w-full md:w-auto px-8 py-3 bg-gradient-to-r from-code-accent to-pink-600 text-white font-bold rounded-xl shadow-lg hover:shadow-code-accent/20 hover:brightness-110 active:scale-95 transition-all duration-150">
+                        Continue to Profile Setup &rarr;
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

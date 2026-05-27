@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block title %}Content Queue | LinkedIn AI Strategist{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <!-- Header -->
+    <div class="flex items-center justify-between pb-6 border-b border-code-border">
+        <div>
+            <h1 class="text-3xl font-extrabold text-white tracking-tight">Content Queue</h1>
+            <p class="text-code-muted mt-1">Review, approve, and manage your AI-generated updates and visuals.</p>
+        </div>
+        <div class="flex items-center space-x-3">
+            <a href="{% url 'linkedin:dashboard' %}" class="px-4 py-2 bg-code-surface border border-code-border text-white font-semibold rounded-xl hover:bg-code-bg transition-colors text-sm">
+                &larr; Dashboard
+            </a>
+            <form method="post" action="{% url 'linkedin:generate_post_now' %}">
+                {% csrf_token %}
+                <button type="submit" class="px-5 py-2.5 bg-gradient-to-r from-code-accent to-pink-600 text-white font-bold rounded-xl shadow-lg hover:shadow-code-accent/20 hover:brightness-110 active:scale-95 transition-all duration-150 text-sm">
+                    Generate New Draft
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Queue Tabs -->
+    <div class="space-y-6">
+        <!-- Drafts Section -->
+        <div class="bg-code-surface border border-code-border rounded-2xl p-6 shadow-xl space-y-4">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-bold text-white flex items-center">
+                    <span class="w-2.5 h-2.5 bg-yellow-500 rounded-full mr-2.5"></span>
+                    Pending Review (Drafts)
+                </h2>
+                <span class="text-xs font-mono bg-code-bg border border-code-border/60 px-2 py-0.5 rounded text-code-muted">{{ drafts.count }} drafts</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {% for post in drafts %}
+                <div class="p-5 bg-code-bg border border-code-border/60 hover:border-code-accent/40 rounded-xl flex flex-col justify-between space-y-4 transition-all group">
+                    <div>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono tracking-wider uppercase bg-code-surface border border-code-border text-code-accent">
+                            {% if post.post_type == 'thought_leadership' %}Thought Leadership
+                            {% elif post.post_type == 'personal_story' %}Personal Story
+                            {% elif post.post_type == 'industry_insight' %}Industry Insight
+                            {% elif post.post_type == 'achievement' %}Achievement
+                            {% elif post.post_type == 'tip_framework' %}Tip & Framework
+                            {% elif post.post_type == 'hot_take' %}Hot Take
+                            {% elif post.post_type == 'case_study' %}Case Study
+                            {% else %}{{ post.post_type }}
+                            {% endif %}
+                        </span>
+                        <p class="text-sm text-code-text mt-3 line-clamp-3">{{ post.hook|default:post.post_text }}</p>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-4 border-t border-code-border/50">
+                        <span class="text-xs text-code-muted font-mono">Created {{ post.created_at|timesince }} ago</span>
+                        <div class="flex items-center space-x-2">
+                            <a href="{% url 'linkedin:post_preview' post.id %}" class="px-3 py-1.5 bg-code-surface hover:bg-code-bg border border-code-border rounded-lg text-xs text-code-muted hover:text-white transition-colors">
+                                Preview
+                            </a>
+                            <a href="{% url 'linkedin:approve_post' post.id %}" class="px-3 py-1.5 bg-green-500/20 hover:bg-green-500/30 border border-green-500/30 rounded-lg text-xs text-green-400 font-bold transition-colors">
+                                Approve
+                            </a>
+                            <a href="{% url 'linkedin:reject_post' post.id %}" class="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-lg text-xs text-red-400 transition-colors">
+                                Reject
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="md:col-span-2 py-8 text-center text-code-muted text-sm bg-code-bg/30 border border-dashed border-code-border/50 rounded-xl">
+                    No draft posts. Click "Generate New Draft" above to create one.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Scheduled / Approved Section -->
+        <div class="bg-code-surface border border-code-border rounded-2xl p-6 shadow-xl space-y-4">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-bold text-white flex items-center">
+                    <span class="w-2.5 h-2.5 bg-blue-500 rounded-full mr-2.5"></span>
+                    Approved & Scheduled
+                </h2>
+                <span class="text-xs font-mono bg-code-bg border border-code-border/60 px-2 py-0.5 rounded text-code-muted">{{ approved.count }} approved</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {% for post in approved %}
+                <div class="p-5 bg-code-bg border border-code-border/60 rounded-xl flex flex-col justify-between space-y-4">
+                    <div>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono tracking-wider uppercase bg-code-surface border border-code-border text-code-accent">
+                            {% if post.post_type == 'thought_leadership' %}Thought Leadership
+                            {% elif post.post_type == 'personal_story' %}Personal Story
+                            {% elif post.post_type == 'industry_insight' %}Industry Insight
+                            {% elif post.post_type == 'achievement' %}Achievement
+                            {% elif post.post_type == 'tip_framework' %}Tip & Framework
+                            {% elif post.post_type == 'hot_take' %}Hot Take
+                            {% elif post.post_type == 'case_study' %}Case Study
+                            {% else %}{{ post.post_type }}
+                            {% endif %}
+                        </span>
+                        <p class="text-sm text-code-text mt-3 line-clamp-3">{{ post.hook|default:post.post_text }}</p>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-4 border-t border-code-border/50">
+                        <span class="text-xs text-code-muted font-mono">Will post next publish cycle</span>
+                        <div class="flex items-center space-x-2">
+                            <a href="{% url 'linkedin:post_preview' post.id %}" class="px-3 py-1.5 bg-code-surface hover:bg-code-bg border border-code-border rounded-lg text-xs text-code-muted hover:text-white transition-colors">
+                                Preview
+                            </a>
+                            <a href="{% url 'linkedin:reject_post' post.id %}" class="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-lg text-xs text-red-400 transition-colors">
+                                Cancel
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="md:col-span-2 py-8 text-center text-code-muted text-sm bg-code-bg/30 border border-dashed border-code-border/50 rounded-xl">
+                    No approved content scheduled. Approve a draft to add it here.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Posted / History Section -->
+        <div class="bg-code-surface border border-code-border rounded-2xl p-6 shadow-xl space-y-4">
+            <h2 class="text-lg font-bold text-white flex items-center">
+                <span class="w-2.5 h-2.5 bg-green-500 rounded-full mr-2.5"></span>
+                Published History
+            </h2>
+            <div class="space-y-3">
+                {% for post in posted %}
+                <div class="p-4 bg-code-bg border border-code-border/60 rounded-xl flex items-center justify-between gap-4">
+                    <div class="truncate">
+                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-mono tracking-wider uppercase bg-code-surface border border-code-border text-code-accent">
+                            {% if post.post_type == 'thought_leadership' %}Thought Leadership
+                            {% elif post.post_type == 'personal_story' %}Personal Story
+                            {% elif post.post_type == 'industry_insight' %}Industry Insight
+                            {% elif post.post_type == 'achievement' %}Achievement
+                            {% elif post.post_type == 'tip_framework' %}Tip & Framework
+                            {% elif post.post_type == 'hot_take' %}Hot Take
+                            {% elif post.post_type == 'case_study' %}Case Study
+                            {% else %}{{ post.post_type }}
+                            {% endif %}
+                        </span>
+                        <p class="text-sm text-code-text truncate mt-1.5">{{ post.hook|default:post.post_text }}</p>
+                    </div>
+                    <div class="flex items-center space-x-2 shrink-0">
+                        <span class="text-xs text-code-muted font-mono">Posted {{ post.posted_at|date:"M d, Y" }}</span>
+                        <a href="{% url 'linkedin:post_preview' post.id %}" class="p-1 bg-code-surface hover:bg-code-bg border border-code-border rounded text-code-muted hover:text-white transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-sm text-code-muted py-4 text-center">No posts published yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -5,14 +5,14 @@ import os
 class GeminiProvider:
 
     MODELS = {
-        "premium":  "gemini-1.5-pro",
-        "balanced": "gemini-1.5-flash",
-        "budget":   "gemini-1.5-flash",
+        "premium":  "gemini-2.5-pro",
+        "balanced": "gemini-3.5-flash",
+        "budget":   "gemini-3.5-flash",
     }
 
     COST_PER_1K = {
-        "gemini-1.5-pro":   {"input": 0.00125, "output": 0.005},
-        "gemini-1.5-flash": {"input": 0.000075, "output": 0.0003},
+        "gemini-2.5-pro":   {"input": 0.00125, "output": 0.005},
+        "gemini-3.5-flash": {"input": 0.000075, "output": 0.0003},
     }
 
     def __init__(self):

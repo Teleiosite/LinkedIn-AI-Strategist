@@ -1,12 +1,12 @@
 """
 ContentService: Generates LinkedIn post text using the AI Router.
 """
-import json
 import logging
 
 from linkedin.models import LinkedInProfile, GeneratedPost
 from linkedin.services.prompt_engine import PromptEngine, UserContext
 from linkedin.services.ai_router import AIRouter
+from linkedin.services.utils import parse_json_robustly
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +43,7 @@ class ContentService:
             temperature=0.8,
         )
 
-        result = json.loads(response["text"])
+        result = parse_json_robustly(response["text"])
         result["cost_usd"] = response["cost_usd"]
         result["model"] = response["model"]
         result["provider"] = response["provider"]
@@ -60,7 +60,7 @@ class ContentService:
             temperature=0.7,
             json_mode=True
         )
-        return json.loads(response["text"])
+        return parse_json_robustly(response["text"])
 
     def generate_comment(
         self,

@@ -67,9 +67,19 @@ class GeneratedPost(models.Model):
     engagement_rate = models.FloatField(default=0.0)
 
     # AI Metadata
-    gpt_model_used = models.CharField(max_length=50, default="gpt-4o")
-    dalle_model_used = models.CharField(max_length=50, default="dall-e-3")
+    text_model_used = models.CharField(max_length=50, default="gpt-4o")
+    image_model_used = models.CharField(max_length=50, default="dall-e-3")
+    text_provider = models.CharField(max_length=50, default="openai")
+    image_provider = models.CharField(max_length=50, default="openai")
     generation_cost_usd = models.DecimalField(max_digits=8, decimal_places=4, default=0)
+
+    @property
+    def gpt_model_used(self):
+        return self.text_model_used
+
+    @property
+    def dalle_model_used(self):
+        return self.image_model_used
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

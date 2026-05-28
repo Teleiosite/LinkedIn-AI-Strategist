@@ -74,23 +74,50 @@ class GeminiProvider:
                 f"[{m['role'].upper()}]\n{m['content']}" for m in user_messages
             )
 
-        response = model.generate_content(prompt)
-        text = response.text
+        # List of model candidates to try (starting with the preferred model)
+        models_to_try = [model_name]
+        if model_name == "gemini-3.5-flash":
+            models_to_try.extend(["gemini-2.5-flash", "gemini-2.0-flash", "gemini-2.0-flash-lite"])
+        elif model_name == "gemini-2.5-pro":
+            models_to_try.extend(["gemini-3.5-flash", "gemini-2.5-flash", "gemini-2.0-flash"])
 
-        # Gemini doesn't always return token counts in all configs — estimate
-        input_tokens = len(prompt) // 4
-        output_tokens = len(text) // 4
-        costs = self.COST_PER_1K.get(model_name, {"input": 0.001, "output": 0.001})
-        cost = (
-            (input_tokens / 1000 * costs["input"]) +
-            (output_tokens / 1000 * costs["output"])
-        )
+        import logging
+        provider_logger = logging.getLogger(__name__)
 
-        return {
-            "text": text,
-            "model": model_name,
-            "cost_usd": round(cost, 6),
-            "provider": self.provider_name,
-            "input_tokens": input_tokens,
-            "output_tokens": output_tokens,
-        }
+        last_err = None
+        for current_model in models_to_try:
+            try:
+                model = genai.GenerativeModel(
+                    model_name=current_model,
+                    generation_config=generation_config,
+                    system_instruction=system_instruction
+                )
+                response = model.generate_content(prompt)
+                text = response.text
+
+                # Gemini doesn't always return token counts in all configs — estimate
+                input_tokens = len(prompt) // 4
+                output_tokens = len(text) // 4
+                costs = self.COST_PER_1K.get(current_model, {"input": 0.000075, "output": 0.0003})
+                cost = (
+                    (input_tokens / 1000 * costs["input"]) +
+                    (output_tokens / 1000 * costs["output"])
+                )
+
+                return {
+                    "text": text,
+                    "model": current_model,
+                    "cost_usd": round(cost, 6),
+                    "provider": self.provider_name,
+                    "input_tokens": input_tokens,
+                    "output_tokens": output_tokens,
+                }
+            except Exception as e:
+                last_err = e
+                provider_logger.warning(
+                    f"[GeminiProvider] Model '{current_model}' failed for task 'post_generation': {e}. "
+                    f"Trying fallback model..."
+                )
+                continue
+
+        raise last_err

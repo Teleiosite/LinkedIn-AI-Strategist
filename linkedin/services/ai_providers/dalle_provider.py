@@ -14,11 +14,19 @@ class DalleImageProvider:
     }
 
     def __init__(self):
-        self.client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
         self.provider_name = "openai_dalle"
+        self._client = None
+
+    def _get_client(self):
+        if self._client is None:
+            from openai import OpenAI
+            from linkedin.services.utils import get_env_or_secret
+            self._client = OpenAI(api_key=get_env_or_secret("OPENAI_API_KEY"))
+        return self._client
 
     def is_available(self) -> bool:
-        return bool(os.environ.get("OPENAI_API_KEY"))
+        from linkedin.services.utils import get_env_or_secret
+        return bool(get_env_or_secret("OPENAI_API_KEY"))
 
     def generate(self, prompt: str, tier: str = "balanced") -> dict:
         """
@@ -37,7 +45,8 @@ class DalleImageProvider:
             kwargs["quality"] = config["quality"]
             kwargs["style"] = "vivid"
 
-        response = self.client.images.generate(**kwargs)
+        client = self._get_client()
+        response = client.images.generate(**kwargs)
 
         return {
             "image_url": response.data[0].url,

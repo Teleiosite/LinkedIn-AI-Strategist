@@ -231,7 +231,9 @@ class AIRouter:
         if not env_var:
             logger.warning(f"[AIRouter] Unknown task '{task}', defaulting to 'balanced'")
             return "balanced"
-        return os.environ.get(env_var, "balanced").lower()
+        from linkedin.services.utils import get_env_or_secret
+        val = get_env_or_secret(env_var)
+        return val.lower() if val else "balanced"
 
     def _log_usage(self, task: str, result: dict):
         """Log AI usage for cost monitoring."""

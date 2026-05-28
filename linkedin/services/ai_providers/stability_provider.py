@@ -16,18 +16,22 @@ class StabilityImageProvider:
 
     def __init__(self):
         self.provider_name = "stability"
-        self.api_key = os.environ.get("STABILITY_API_KEY", "")
+
+    def _get_api_key(self) -> str:
+        from linkedin.services.utils import get_env_or_secret
+        return get_env_or_secret("STABILITY_API_KEY")
 
     def is_available(self) -> bool:
-        return bool(self.api_key)
+        return bool(self._get_api_key())
 
     def generate(self, prompt: str, tier: str = "balanced") -> dict:
         config = self.TIER_CONFIG.get(tier, self.TIER_CONFIG["balanced"])
+        api_key = self._get_api_key()
 
         response = httpx.post(
             self.API_URL,
             headers={
-                "Authorization": f"Bearer {self.api_key}",
+                "Authorization": f"Bearer {api_key}",
                 "Accept": "application/json",
             },
             data={

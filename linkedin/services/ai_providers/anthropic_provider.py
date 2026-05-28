@@ -22,11 +22,13 @@ class AnthropicProvider:
     def _get_client(self):
         if self._client is None:
             import anthropic
-            self._client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+            from linkedin.services.utils import get_env_or_secret
+            self._client = anthropic.Anthropic(api_key=get_env_or_secret("ANTHROPIC_API_KEY"))
         return self._client
 
     def is_available(self) -> bool:
-        return bool(os.environ.get("ANTHROPIC_API_KEY"))
+        from linkedin.services.utils import get_env_or_secret
+        return bool(get_env_or_secret("ANTHROPIC_API_KEY"))
 
     def complete(
         self,

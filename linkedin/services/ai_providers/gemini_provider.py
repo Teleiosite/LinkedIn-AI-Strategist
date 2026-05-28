@@ -22,12 +22,14 @@ class GeminiProvider:
     def _get_client(self):
         if self._client is None:
             import google.generativeai as genai
-            genai.configure(api_key=os.environ["GOOGLE_AI_API_KEY"])
+            from linkedin.services.utils import get_env_or_secret
+            genai.configure(api_key=get_env_or_secret("GOOGLE_AI_API_KEY"))
             self._client = genai
         return self._client
 
     def is_available(self) -> bool:
-        return bool(os.environ.get("GOOGLE_AI_API_KEY"))
+        from linkedin.services.utils import get_env_or_secret
+        return bool(get_env_or_secret("GOOGLE_AI_API_KEY"))
 
     def complete(
         self,

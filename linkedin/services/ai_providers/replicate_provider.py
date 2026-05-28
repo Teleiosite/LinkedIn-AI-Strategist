@@ -32,13 +32,18 @@ class ReplicateImageProvider:
         self._client = None
 
     def _get_client(self):
+        from linkedin.services.utils import get_env_or_secret
+        token = get_env_or_secret("REPLICATE_API_TOKEN")
+        if token:
+            os.environ["REPLICATE_API_TOKEN"] = token
         if self._client is None:
             import replicate
             self._client = replicate
         return self._client
 
     def is_available(self) -> bool:
-        return bool(os.environ.get("REPLICATE_API_TOKEN"))
+        from linkedin.services.utils import get_env_or_secret
+        return bool(get_env_or_secret("REPLICATE_API_TOKEN"))
 
     def generate(self, prompt: str, tier: str = "balanced") -> dict:
         replicate = self._get_client()

@@ -27,11 +27,13 @@ class GroqProvider:
     def _get_client(self):
         if self._client is None:
             from groq import Groq
-            self._client = Groq(api_key=os.environ["GROQ_API_KEY"])
+            from linkedin.services.utils import get_env_or_secret
+            self._client = Groq(api_key=get_env_or_secret("GROQ_API_KEY"))
         return self._client
 
     def is_available(self) -> bool:
-        return bool(os.environ.get("GROQ_API_KEY"))
+        from linkedin.services.utils import get_env_or_secret
+        return bool(get_env_or_secret("GROQ_API_KEY"))
 
     def complete(
         self,

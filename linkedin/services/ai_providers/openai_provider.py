@@ -19,11 +19,19 @@ class OpenAITextProvider:
     }
 
     def __init__(self):
-        self.client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
         self.provider_name = "openai"
+        self._client = None
+
+    def _get_client(self):
+        if self._client is None:
+            from openai import OpenAI
+            from linkedin.services.utils import get_env_or_secret
+            self._client = OpenAI(api_key=get_env_or_secret("OPENAI_API_KEY"))
+        return self._client
 
     def is_available(self) -> bool:
-        return bool(os.environ.get("OPENAI_API_KEY"))
+        from linkedin.services.utils import get_env_or_secret
+        return bool(get_env_or_secret("OPENAI_API_KEY"))
 
     def complete(
         self,
@@ -47,7 +55,8 @@ class OpenAITextProvider:
         if json_mode:
             kwargs["response_format"] = {"type": "json_object"}
 
-        response = self.client.chat.completions.create(**kwargs)
+        client = self._get_client()
+        response = client.chat.completions.create(**kwargs)
         text = response.choices[0].message.content
 
         # Calculate cost

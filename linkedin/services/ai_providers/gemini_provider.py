@@ -42,22 +42,37 @@ class GeminiProvider:
         genai = self._get_client()
         model_name = self.MODELS.get(tier, self.MODELS["balanced"])
 
+        # Extract system instruction if present, and collect remaining messages
+        system_instruction = None
+        user_messages = []
+        for m in messages:
+            if m["role"] == "system":
+                system_instruction = m["content"]
+            else:
+                user_messages.append(m)
+
         generation_config = {
             "temperature": temperature,
-            "max_output_tokens": max_tokens,
         }
+        # Avoid Gemini's truncation bug by omitting max_output_tokens if under 2000
+        if max_tokens and max_tokens >= 2000:
+            generation_config["max_output_tokens"] = max_tokens
+
         if json_mode:
             generation_config["response_mime_type"] = "application/json"
 
         model = genai.GenerativeModel(
             model_name=model_name,
             generation_config=generation_config,
+            system_instruction=system_instruction
         )
 
-        # Flatten messages to Gemini format
-        prompt = "\n\n".join(
-            f"[{m['role'].upper()}]\n{m['content']}" for m in messages
-        )
+        if len(user_messages) == 1:
+            prompt = user_messages[0]["content"]
+        else:
+            prompt = "\n\n".join(
+                f"[{m['role'].upper()}]\n{m['content']}" for m in user_messages
+            )
 
         response = model.generate_content(prompt)
         text = response.text
